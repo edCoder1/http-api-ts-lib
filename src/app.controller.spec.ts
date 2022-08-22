@@ -1,22 +1,26 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+// import { HttpModule } from '@nestjs/axios';
+// import { ValidationPipe } from '@nestjs/common';
+// import { Test, TestingModule } from '@nestjs/testing';
+// import { AppController } from './app.controller';
+// import { AppService } from './app.service';
+// import { DriverService } from './services/driver.service';
 
-describe('AppController', () => {
-  let appController: AppController;
+// describe('AppController', () => {
+//   let appController: AppController;
 
-  beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile();
+//   beforeEach(async () => {
+//     const app: TestingModule = await Test.createTestingModule({
+//       imports: [HttpModule],
+//       controllers: [AppController],
+//       providers: [DriverService, ValidationPipe],
+//     }).compile();
 
-    appController = app.get<AppController>(AppController);
-  });
+//     appController = app.get<AppController>(AppController);
+//   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
-  });
-});
+//   describe('root', () => {
+//     it('should return [] with 5 elements', () => {
+//       expect(appController.getAllEvents(5)).toBe([]);
+//     });
+//   });
+// });
