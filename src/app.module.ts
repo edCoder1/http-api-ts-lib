@@ -8,11 +8,12 @@ import { DriverService } from './services/driver.service';
   imports: [HttpModule],
   controllers: [AppController],
   providers: [{
-    provide: 'EVENTS_API',
+    provide: 'EVENTS_DRIVER',
     useFactory: () => {
       const httpService: HttpService = new HttpService()
       // here I would use env variables... or I would let the responsability of providing
-      // host and base urls to the user... I have'em harcoded for now
+      // host, base urls and creds to the user...
+      // I have'em harcoded for now
       return new DriverService(httpService, 'https://platform-interview-test.herokuapp.com', 'api', 'JHgm8A3YWnGDIXrLImMiYk5e3AmK5rDS')
     }
   }, ValidationPipe],

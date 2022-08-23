@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, ParseIntPipe, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Inject, Param, ParseIntPipe, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
 import { GetAllEventsDTO } from './dtos/getAllEvents.dto';
 import { BaseResponse } from './interfaces/HttpResponses.interfce';
@@ -12,16 +12,13 @@ export type GetEventsFields = 'status' | 'id' | 'event_type'
 @Controller('events')
 export class AppController {
   constructor(
-    @Inject('EVENTS_API')
+    @Inject('EVENTS_DRIVER')
     private readonly driverService: DriverService,
   ) {}
 
   @Get('all')
   @UsePipes(new ValidationPipe())
-  async getAllEvents(@Query() count: number, @Query() orderBy: GetEventsFields): Promise<BaseResponse> {
-
-    console.log({ count, orderBy });
-    
+  async getAllEvents(@Query('count') count: number, @Query('orderBy') orderBy: GetEventsFields): Promise<BaseResponse> {
 
     let eventsArray: ZapierEvent[];
 
@@ -42,6 +39,17 @@ export class AppController {
 
     return response;
 
+  }
+
+  @Get()
+  getEvent(@Param('id') id: number): BaseResponse {
+    // todo: implement method on service layer
+    // return this.driverService.getAllEvent(id);
+    return {
+      code: 200,
+      message: 'success',
+      data: [{} as ZapierEvent]
+    }
   }
 
 }
