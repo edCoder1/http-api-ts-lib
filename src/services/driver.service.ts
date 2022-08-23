@@ -2,6 +2,7 @@ import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import { catchError, firstValueFrom, map, Observable, of, tap } from "rxjs";
 import { GetEventsFields } from "src/app.controller";
+import { CreateEventDTO } from "src/dtos/CreateEvent.dto";
 import { GetEventsResponse } from "src/interfaces/GetEventsResponse.interface";
 import { ZapierEvent } from "src/interfaces/ZapierEvent.interface";
 
@@ -15,7 +16,7 @@ interface I {
 
 // const, enums here too
 enum Endpoints {
-  GET_ALL_EVENTS = 'events',
+  EVENTS = 'events',
 }
 
 
@@ -33,23 +34,21 @@ export class DriverService {
     this.apiID = apiID;
   }
 
-  
-  
   public async getAllEvents(recordsCount: number, orderBy?: GetEventsFields): Promise<ZapierEvent[] | Error> {
 
     console.log({ recordsCount, orderBy });
 
-    const zapierEvents$: Observable<ZapierEvent[] | Error> =  this.httpService.get<GetEventsResponse>(`${this.serviceHost}/${this.baseUrl}/${Endpoints.GET_ALL_EVENTS}`,
+    const zapierEvents$: Observable<ZapierEvent[] | Error> =  this.httpService.get<GetEventsResponse>(`${this.serviceHost}/${this.baseUrl}/${Endpoints.EVENTS}`,
       {
         params: {
             per_page: recordsCount,
             order_by: orderBy
           },
-          auth: {
-            username: this.apiID,
-            // pass is ignored per documentation
-            password: '',
-          }
+        auth: {
+          username: this.apiID,
+          // pass is ignored per documentation
+          password: '',
+        }
       }
     )
     .pipe(
@@ -81,4 +80,32 @@ export class DriverService {
 
       return await firstValueFrom(zapierEvents$)
   }
+
+  async getEvent(id: number): Promise<ZapierEvent> {
+    // throw new Error('Method not implemented.');
+
+    // todo: add basic authenticationat service/instance level so we do not add it to every route
+    const event$ = this.httpService.get(`${this.serviceHost}/${this.baseUrl}/${id}`, {
+      auth: {
+        username: this.apiID,
+        password: ''
+      }
+    })
+    .pipe(
+      map((response) => response.data)
+    );
+    
+    return firstValueFrom(event$)
+
+  }
+
+  async createEvent(event: CreateEventDTO): Promise<ZapierEvent> {
+    const newEvent$ = this.httpService.post(`${this.serviceHost}/${this.baseUrl}/${Endpoints.EVENTS}`, { ...event })
+    .pipe(
+      map((response) => response.data)
+    );
+
+    return await firstValueFrom(newEvent$);
+  }
+
 }

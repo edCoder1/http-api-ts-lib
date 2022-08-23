@@ -1,5 +1,6 @@
-import { Controller, Get, Inject, Param, ParseIntPipe, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
+import { CreateEventDTO } from './dtos/CreateEvent.dto';
 import { GetAllEventsDTO } from './dtos/getAllEvents.dto';
 import { BaseResponse } from './interfaces/HttpResponses.interfce';
 import { ZapierEvent } from './interfaces/ZapierEvent.interface';
@@ -17,6 +18,7 @@ export class AppController {
   ) {}
 
   @Get('all')
+  // pipes are used for schema validation.. look at the swagger doc 
   @UsePipes(new ValidationPipe())
   async getAllEvents(@Query('count') count: number, @Query('orderBy') orderBy: GetEventsFields): Promise<BaseResponse> {
 
@@ -41,15 +43,49 @@ export class AppController {
 
   }
 
-  @Get()
-  getEvent(@Param('id') id: number): BaseResponse {
-    // todo: implement method on service layer
-    // return this.driverService.getAllEvent(id);
+  @Get(':id')
+  @UsePipes(new ValidationPipe())
+  async getEvent(@Param('id') id: number): Promise<BaseResponse> {
+
+
+    let zapierEvent: ZapierEvent;
+
+    try {
+      
+      zapierEvent = await this.driverService.getEvent(id);
+    } catch (error) {
+      console.log({error});
+      
+      if (error.response?.status === 404) {
+        zapierEvent = {} as ZapierEvent;
+      }
+      
+    }
+
+    // todo: implement response handler/utility
     return {
       code: 200,
       message: 'success',
-      data: [{} as ZapierEvent]
+      data: [zapierEvent]
     }
   }
 
+  @Post()
+  // pipes are used for schema validation.. look at the swagger doc and try out this route with empty body to get validation errors
+  @UsePipes(new ValidationPipe())
+  async createEvent(@Body() event: CreateEventDTO): Promise<BaseResponse> {
+    let newEvent: ZapierEvent;
+
+    try {
+      newEvent = await this.driverService.createEvent(event);
+    } catch (error) {
+      throw new Error(error)
+    }
+
+    return {
+      code: 200,
+      message: 'success',
+      data: [newEvent]
+    }
+  }
 }
